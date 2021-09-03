@@ -1,7 +1,10 @@
 name = "VectorPartitions"
 uuid = "c3f1c54d-acb5-413c-88d6-99f2f9db821c"
-authors = ["Jakob Hansen <jakob@jakobhansen.org> and contributors"]
+authors = ["Jakob Hansen <jakob@jakobhansen.org>"]
 version = "0.1.0"
+
+[deps]
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 julia = "1"
