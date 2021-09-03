@@ -1,7 +1,7 @@
 module VectorPartitions
 using StaticArrays
 
-export VectorPartition, all_vector_partitions, increment_vector_partition_state!
+export all_vector_partitions, increment_vector_partition_state!
 
 struct VectorPartition
   n_elements::Int
@@ -20,6 +20,13 @@ mutable struct VectorPartitionState{n,k}
   done::Bool
 end
 
+"""
+    all_vector_partitions(n,k)
+
+Create an iterator that produces all partitions of the set {1,...,`n`} into `k` nonempty subsets.
+
+Partitions are represented as vectors of length `n` with values between 1 and `k`.
+"""
 function all_vector_partitions(n,k)
   if n <= 0 
     throw(DomainError(n, "Number of elements in the set must be positive."))
@@ -66,6 +73,22 @@ function next_vector_partition_state(I::VectorPartition,state)
   return state_c
 end
 
+"""
+    increment_vector_partition_state!(I,state)
+
+Update the state of a VectorPartition iterator. 
+Useful to avoid copying the state unnecessarily at the cost of destructive mutations.
+
+# Examples
+```julia
+iter = all_vector_partitions(5,3)
+_, state = iterate(iter)
+while !state.done
+  do_stuff(state.partition)
+  increment_vector_partition_state!(iter,state)
+end
+```
+"""
 function increment_vector_partition_state!(I::VectorPartition,state)
   # increment the sequence subject to upper bound and carry
   if state.done
