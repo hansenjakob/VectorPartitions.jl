@@ -61,7 +61,7 @@ function next_vector_partition_state(I::VectorPartition,state)
   if state.done
     return state
   end
-  state_c = copy(state)
+  state_c = VectorPartitionState{I.n_elements,I.n_partitions}(state.upper_bound,state.partition,state.first_index,false) 
   increment_vector_partition_state!(I,state_c)
   return state_c
 end
