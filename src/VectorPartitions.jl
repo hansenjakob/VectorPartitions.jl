@@ -85,7 +85,7 @@ end
 
 Update the state of a VectorPartition iterator. 
 Useful to avoid copying the state unnecessarily at the cost of destructive mutations. 
-This can result in significant speedups when you only need to reference the partition.
+This can result in significant speedups when you only need to look at each partition once. 
 
 # Examples
 ```julia
@@ -102,6 +102,7 @@ function increment_vector_partition_state!(I::VectorPartition,state)
   if state.done
     return
   end
+  @inbounds begin
   state.partition[2] += 1
   for i in 2:I.n_elements-1
     if state.partition[i] > state.upper_bound[i]
@@ -113,9 +114,10 @@ function increment_vector_partition_state!(I::VectorPartition,state)
       state.partition[i+1] += 1
     end
   end
+  end
 
   # overflow condition: need to change the upper bound
-  if state.partition[end] > state.upper_bound[end]
+  @inbounds if state.partition[I.n_elements] > state.upper_bound[I.n_elements]
     stop = increment_surjective_monotone_sequence!(state.upper_bound,I.n_partitions,state.first_index)
     if stop
       state.done = true 
@@ -130,6 +132,7 @@ end
 function increment_surjective_monotone_sequence!(seq,maxval,step_locations)
   stop = true
   #update location of the increments 
+  @inbounds begin
   for i in 2:length(step_locations)
     if step_locations[i] > step_locations[i-1] + 1
       step_locations[i] -= 1
@@ -146,7 +149,7 @@ function increment_surjective_monotone_sequence!(seq,maxval,step_locations)
     seq[step_locations[i]:step_locations[i+1]-1] .= i
   end
   seq[step_locations[end]:end] .= maxval
-
+  end
   return stop
 end
 
