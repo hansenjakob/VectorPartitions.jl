@@ -46,7 +46,7 @@ end
 
 @test count_partition_iterator(5,2) == stirlings2(5,2)
 @test count_partitions_raw(5,2) == stirlings2(5,2)
-@test count_partitions_stateful(5,2) == stirlings(5,2)
+@test count_partitions_stateful(5,2) == stirlings2(5,2)
 
 
 end
