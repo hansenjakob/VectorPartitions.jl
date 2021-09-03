@@ -40,6 +40,15 @@ function all_vector_partitions(n,k)
   return VectorPartition(n,k)
 end
 
+"""
+    all_vector_partitions(n)
+
+Create an iterator that produces all partitions of the set {1,...,'n'} into any number of nonempty subsets.
+
+Partitions into k subsets are represented as vectors of length `n` with values between 1 and k.
+"""
+all_vector_partitions(n) = Iterators.flatten((all_vector_partitions(n,k) for k in 1:n))
+
 function Base.iterate(I::VectorPartition)
   state = initial_vector_partition_state(I)
   return state.partition, state
@@ -53,10 +62,6 @@ function Base.iterate(I::VectorPartition,state)
   return next_state.partition, next_state
 end
 
-#okay, apparently it is not recommended to have iterators actually mutate the
-#state. so probably the way to go about this is to have two implementations, one
-#mutational and one static
-
 function initial_vector_partition_state(I::VectorPartition)
   upper_bound = cat(ones(Int, I.n_elements-I.n_partitions),collect(1:I.n_partitions),dims=1)
   first_index = cat(1, (I.n_elements-Int64(I.n_partitions)) .+ collect(2:I.n_partitions),dims=1)
@@ -64,6 +69,8 @@ function initial_vector_partition_state(I::VectorPartition)
   return state
 end
 
+# because it is not recommended to have iterators mutate their state directly,
+# this function copies before incrementing.
 function next_vector_partition_state(I::VectorPartition,state)
   if state.done
     return state
@@ -77,7 +84,8 @@ end
     increment_vector_partition_state!(I,state)
 
 Update the state of a VectorPartition iterator. 
-Useful to avoid copying the state unnecessarily at the cost of destructive mutations.
+Useful to avoid copying the state unnecessarily at the cost of destructive mutations. 
+This can result in significant speedups when you only need to reference the partition.
 
 # Examples
 ```julia
