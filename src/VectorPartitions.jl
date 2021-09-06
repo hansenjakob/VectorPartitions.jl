@@ -145,6 +145,7 @@ function increment_surjective_monotone_sequence!(seq,maxval,step_locations)
       break
     end
   end
+  
   for i in 1:length(step_locations)-1
     seq[step_locations[i]:step_locations[i+1]-1] .= i
   end
